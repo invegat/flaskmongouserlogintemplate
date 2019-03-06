@@ -5,22 +5,25 @@ from wtforms import StringField, PasswordField
 from wtforms.validators import Email, Length, InputRequired
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+import os
+SECRET_KEY = os.urandom(32)
 
 app = Flask(__name__)
-
 app.config['MONGODB_SETTINGS'] = {
-    'db': '<---YOUR_DB_NAME--->',
-    'host': 'mongodb://<---YOUR_DB_FULL URI--->'
+    'db': 'testdb',
+    'host': 'mongodb://localhost'
 }
-
 db = MongoEngine(app)
-app.config['SECRET_KEY'] = '<---YOUR_SECRET_FORM_KEY--->'
+app.config['SECRET_KEY'] = SECRET_KEY
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+def create_app():
+    return app
+
 class User(UserMixin, db.Document):
-    meta = {'collection': '<---YOUR_COLLECTION_NAME--->'}
+    meta = {'collection': 'testCo'}
     email = db.StringField(max_length=30)
     password = db.StringField()
 
@@ -69,3 +72,4 @@ def dashboard():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
